@@ -38,15 +38,13 @@
      Unblock-File -Path ".\mihomo-manager.ps1"
 
 3. 运行脚本：
-   ```powershell
-   .\mihomo-manager.ps1
-   ```
-   如果因执行策略无法运行，可临时使用：
-   ```powershell
-   powershell -ExecutionPolicy Bypass -File ".\mihomo-manager.ps1"
-   ```
 
-脚本启动时会自动检测管理员权限，若非管理员则自动重新以管理员身份启动，无需手动右键“以管理员身份运行”。
+   - **直接双击** `mihomo-manager.ps1` 文件，系统会自动以 PowerShell 运行。
+   - 若双击后打开的是代码编辑器，可右键点击文件 → **使用 PowerShell 运行**。
+   - 脚本启动时会自动检测管理员权限，若非管理员则弹出 UAC 窗口以管理员身份重新启动，无需手动提权。
+
+> 💡 如果系统 PowerShell 执行策略禁止脚本运行（极少见情况），可临时执行：  
+> `powershell -ExecutionPolicy Bypass -File ".\mihomo-manager.ps1"`
 
 ## 🕹️ 使用方式
 
