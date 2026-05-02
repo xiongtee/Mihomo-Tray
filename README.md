@@ -149,8 +149,3 @@ D:\Portable\mihomo\
 
 - 原作者：[clash](https://github.com/lvbibir)
 - 脚本中的延迟测试部分已移除，保留常用核心管理功能。
-
----
-
-**注意：** 请确保你拥有 Mihomo 内核的合法使用授权，并遵守当地网络管理法规。
-```
