@@ -22,10 +22,21 @@
 ## ⚡ 快速开始
 
 1. 将 `mihomo-manager.ps1`、`mihomo-windows-amd64.exe` 和 `mihomo.yaml` 放在同一目录下。
-2. 首次运行前可能需要解除脚本锁定（如果通过网络下载获得）：
-   ```powershell
-   Unblock-File -Path ".\mihomo-manager.ps1"
-   ```
+
+2. 获取脚本文件（推荐复制粘贴，避免文件锁定）：
+
+   **✅ 推荐方式：直接复制脚本内容**
+   - 打开文本编辑器（如记事本），粘贴完整的脚本代码。
+   - 保存为 `mihomo-manager.ps1`，编码选择 **UTF-8 with BOM**。
+   - 通过此方式生成的文件不会带有“从网络下载”的安全标记，可直接运行，无需额外解锁。
+
+   **🔄 备选方式：从网络下载后解除锁定**
+   - 如果通过浏览器或其他方式下载了脚本文件，Windows 可能会将其标记为“来自 Internet”，导致无法执行。
+   - 右键点击 `mihomo-manager.ps1` → **属性** → 勾选 **解除锁定** → 确定。
+   - 或在 PowerShell 中执行：
+     ```powershell
+     Unblock-File -Path ".\mihomo-manager.ps1"
+
 3. 运行脚本：
    ```powershell
    .\mihomo-manager.ps1
