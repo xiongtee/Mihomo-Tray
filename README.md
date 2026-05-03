@@ -1,6 +1,6 @@
 # Mihomo Manager
 
-一个用于管理 Mihomo 代理裸核的 PowerShell 脚本，提供交互式菜单与命令行参数两种使用方式。支持启动、停止、重启、状态查看、配置重载、一键开关系统代理以及管理员权限自动提升（用于TUN）。
+一个用于管理 Mihomo 代理裸核的 PowerShell 脚本，提供交互式菜单与命令行参数两种使用方式。支持启动、停止、重启、状态查看、配置重载、一键开关系统代理，并可手动提升为管理员权限（用于 TUN 等需要特权的场景）。
 
 ## ✨ 功能特性
 
@@ -9,7 +9,7 @@
 - 🔄 重载配置文件（无需重启）
 - ✅ 验证配置文件语法
 - 🌐 一键开启或关闭 Windows 系统代理（指向 Mihomo 代理端口）
-- 🔒 以管理员权限启动内核（避免部分功能受限）
+- 🔒 以管理员权限启动 Mihomo 进程（`admin-start`），或手动将脚本自身提升至管理员（`elevate`）
 - 📜 支持命令行参数直接调用，便于集成到其他脚本或快捷方式
 - 🧩 自动读取 `mihomo.yaml` 中的 `secret` 或环境变量，保障 API 通信安全
 
@@ -36,12 +36,13 @@
    - 或在 PowerShell 中执行：
      ```powershell
      Unblock-File -Path ".\mihomo-manager.ps1"
+     ```
 
 3. 运行脚本：
 
    - **直接双击** `mihomo-manager.ps1` 文件，系统会自动以 PowerShell 运行。
    - 若双击后打开的是代码编辑器，可右键点击文件 → **使用 PowerShell 运行**。
-   - 脚本启动时会自动检测管理员权限，若非管理员则弹出 UAC 窗口以管理员身份重新启动，无需手动提权。
+   - 脚本默认以当前用户权限运行。若需管理员权限（例如使用 TUN 模式），可在交互菜单中输入 `0`，或在命令行中使用 `elevate` 命令手动提权。
 
 > 💡 如果系统 PowerShell 执行策略禁止脚本运行（极少见情况），可临时执行：  
 > `powershell -ExecutionPolicy Bypass -File ".\mihomo-manager.ps1"`
@@ -68,6 +69,7 @@ Mihomo 裸核控制面板
   [7] 帮助信息
   [8] 切换系统代理
   [9] 管理员启动 Mihomo
+  [0] 获取管理员权限 (提升脚本)
 
   [Q] 退出
 ```
@@ -84,12 +86,14 @@ Mihomo 裸核控制面板
 | `proxy-on`    | 开启系统代理                 |
 | `proxy-off`   | 关闭系统代理                 |
 | `admin-start` | 以管理员权限启动 Mihomo      |
+| `elevate`     | 提升当前脚本为管理员权限     |
 | `help`        | 显示帮助信息                 |
 
 示例：
 ```powershell
 .\mihomo-manager.ps1 start
 .\mihomo-manager.ps1 proxy-on
+.\mihomo-manager.ps1 elevate
 .\mihomo-manager.ps1 admin-start
 ```
 
@@ -138,9 +142,13 @@ D:\Portable\mihomo\
 - 对脚本文件右键 → 属性 → 勾选“解除锁定” → 确定。
 - 或在 PowerShell 中执行 `Unblock-File -Path "路径\mihomo-manager.ps1"`。
 
-### 2. 停止 Mihomo 时提示 `Access is denied`
+### 2. 停止 Mihomo 或操作需要管理员权限时提示权限不足
 
-本脚本已内置自动管理员提权，通常不会出现此问题。若仍发生，请检查是否以管理员身份运行了原 PowerShell 窗口（脚本会在启动时自动请求管理员权限，无需手动提权）。
+脚本默认以普通用户权限运行。若需要管理员权限（例如停止以管理员启动的进程、使用 TUN 模式），请通过以下方式手动提权：
+- 在交互菜单中输入 `0`。
+- 或在命令行中执行 `.\mihomo-manager.ps1 elevate`。
+
+提权后会重新启动当前脚本并继承之前的操作参数。
 
 ### 3. 系统代理无法开启/关闭
 
