@@ -1,168 +1,131 @@
 # Mihomo Manager
 
-一个用于管理 Mihomo 代理裸核的 PowerShell 脚本，提供交互式菜单与命令行参数两种使用方式。支持启动、停止、重启、状态查看、配置重载、一键开关系统代理，并可手动提升为管理员权限（用于 TUN 等需要特权的场景）。
+一个轻量级的 Windows 系统托盘工具，用于一键管理 [Mihomo](https://github.com/MetaCubeX/mihomo) 代理内核的**系统代理模式**和 **TUN 模式**，同时提供配置重载、验证、开机自启等常用功能。
+
+使用 AutoHotkey v2 编写，已编译为独立 `.exe`，无需安装任何依赖。
 
 ## ✨ 功能特性
 
-- 🚀 启动 / 停止 / 重启 Mihomo 内核
-- 📊 查看运行状态（PID、运行时长、内存占用、API 状态）
-- 🔄 重载配置文件（无需重启）
-- ✅ 验证配置文件语法
-- 🌐 一键开启或关闭 Windows 系统代理（指向 Mihomo 代理端口）
-- 🔒 以管理员权限启动 Mihomo 进程（`admin-start`），或手动将脚本自身提升至管理员（`elevate`）
-- 📜 支持命令行参数直接调用，便于集成到其他脚本或快捷方式
-- 🧩 自动读取 `mihomo.yaml` 中的 `secret` 或环境变量，保障 API 通信安全
+- 🌐 **模式一键切换**  
+  - 系统代理模式：启动内核 + 设置 Windows 系统代理  
+  - TUN 模式：以管理员权限启动内核，不修改系统代理
+- 🔄 **配置重载**  
+  调用 Mihomo API 热重载配置文件，无需重启内核
+- ✅ **配置验证**  
+  检查 `mihomo.yaml` 语法是否合法，避免启动失败
+- 📌 **开机自启**  
+  一键启用/取消开机自动运行，托盘启动后自动最小化
+- 🔒 **自动提权**  
+  程序启动时自动请求管理员权限，确保 TUN 模式/进程终止稳定可靠
+- 💬 **气泡提示反馈**  
+  所有操作结果均通过系统托盘气泡显示，不干扰当前工作
 
 ## 📋 系统要求
 
-- Windows 7 及以上
-- PowerShell 5.1 或更高版本（推荐 PowerShell 7）
-- Mihomo 裸核程序 `mihomo-windows-amd64.exe` 与配置文件 `mihomo.yaml` 需放置于脚本同目录
+- Windows 7 及以上（推荐 Windows 10/11）
+- 无需安装 AutoHotkey 或 PowerShell，直接运行 `.exe`
+- 需要将下列文件放在**同一目录**：
+  - `MihomoTray.exe`（本工具）
+  - `mihomo-windows-amd64.exe`（Mihomo 内核）
+  - `mihomo.yaml`（Mihomo 配置文件）
 
 ## ⚡ 快速开始
 
-1. 将 `mihomo-manager.ps1`、`mihomo-windows-amd64.exe` 和 `mihomo.yaml` 放在同一目录下。
+### 从 Releases 获取
 
-2. 获取脚本文件（推荐复制粘贴，避免文件锁定）：
+1. 前往 [Releases](../../releases) 页面，下载最新版的 `MihomoTray.exe`。
+2. 将 `MihomoTray.exe` 放到已包含 `mihomo-windows-amd64.exe` 和 `mihomo.yaml` 的文件夹内。
+3. 双击运行 `MihomoTray.exe`，托盘区会出现一个网络图标 🌐。
+4. 右键托盘图标即可切换代理模式、重载配置等。
+5. （可选）在菜单中勾选「✅ 开机自启」，使工具随系统启动。
 
-   **✅ 推荐方式：直接复制脚本内容**
-   - 打开文本编辑器（如记事本），粘贴完整的脚本代码。
-   - 保存为 `mihomo-manager.ps1`，编码选择 **UTF-8 with BOM**。
-   - 通过此方式生成的文件不会带有“从网络下载”的安全标记，可直接运行，无需额外解锁。
+> 💡 首次运行时，Windows 或杀毒软件可能弹出安全警告，点击“更多信息”→“仍要运行”即可。这是因为编译后的 `.exe` 未购买代码签名证书，并非恶意软件。  
+> 本工具开源，所有源码可见 [mihomo-manager.ahk](./mihomo-manager.ahk)，可自行审查或用 [AutoHotkey v2](https://www.autohotkey.com/) 重新编译。
 
-   **🔄 备选方式：从网络下载后解除锁定**
-   - 如果通过浏览器或其他方式下载了脚本文件，Windows 可能会将其标记为“来自 Internet”，导致无法执行。
-   - 右键点击 `mihomo-manager.ps1` → **属性** → 勾选 **解除锁定** → 确定。
-   - 或在 PowerShell 中执行：
-     ```powershell
-     Unblock-File -Path ".\mihomo-manager.ps1"
-     ```
+## 🕹️ 托盘菜单说明
 
-3. 运行脚本：
+右键系统托盘图标，弹出菜单：
 
-   - **直接双击** `mihomo-manager.ps1` 文件，系统会自动以 PowerShell 运行。
-   - 若双击后打开的是代码编辑器，可右键点击文件 → **使用 PowerShell 运行**。
-   - 脚本默认以当前用户权限运行。若需管理员权限（例如使用 TUN 模式），可在交互菜单中输入 `0`，或在命令行中使用 `elevate` 命令手动提权。
+| 菜单项 | 功能 |
+|--------|------|
+| **系统代理模式** | 若当前未启用，则启动内核并设置系统代理 (`127.0.0.1:7890`)；若已启用，则停止内核并关闭代理 |
+| **TUN 模式** | 若当前未启用，则以管理员权限启动内核，**不设置**系统代理；若已启用，则强制终止内核进程 |
+| **🔁 重载配置** | 调用 API 热重载 `mihomo.yaml`，适用于修改规则或节点后快速生效 |
+| **ℹ️ 验证配置** | 使用 `mihomo-windows-amd64.exe -t` 测试配置文件合法性，结果以气泡提示显示 |
+| **✅ 开机自启** | 切换当前工具的开机启动状态，打勾表示已启用 |
+| **❌ 退出** | 退出托盘程序（*不会停止正在运行的 Mihomo 内核*，如需停止请先使用“系统代理模式”或“TUN 模式”菜单关闭） |
 
-> 💡 如果系统 PowerShell 执行策略禁止脚本运行（极少见情况），可临时执行：  
-> `powershell -ExecutionPolicy Bypass -File ".\mihomo-manager.ps1"`
-
-## 🕹️ 使用方式
-
-### 交互菜单
-
-不带任何参数即可进入菜单模式，选择数字选项执行对应操作：
-
-```
-Mihomo 裸核控制面板
-===========================================
-  当前状态: 运行中 (PID 12345)
-  系统代理: 开启 (127.0.0.1:7890)
-  脚本权限: 管理员
-
-  [1] 启动 Mihomo
-  [2] 停止 Mihomo
-  [3] 重启 Mihomo
-  [4] 查看状态
-  [5] 重载配置
-  [6] 验证配置
-  [7] 帮助信息
-  [8] 切换系统代理
-  [9] 管理员启动 Mihomo
-  [0] 获取管理员权限 (提升脚本)
-
-  [Q] 退出
-```
-
-### 命令行参数
-
-| 命令          | 说明                         |
-| ------------- | ---------------------------- |
-| `start`       | 启动 Mihomo                  |
-| `stop`        | 停止 Mihomo                  |
-| `restart`     | 重启 Mihomo                  |
-| `status`      | 查看运行状态                 |
-| `reload`      | 重载配置文件                 |
-| `proxy-on`    | 开启系统代理                 |
-| `proxy-off`   | 关闭系统代理                 |
-| `admin-start` | 以管理员权限启动 Mihomo      |
-| `elevate`     | 提升当前脚本为管理员权限     |
-| `help`        | 显示帮助信息                 |
-
-示例：
-```powershell
-.\mihomo-manager.ps1 start
-.\mihomo-manager.ps1 proxy-on
-.\mihomo-manager.ps1 elevate
-.\mihomo-manager.ps1 admin-start
-```
+菜单项会**自动更新状态**，例如当前已开启系统代理时，菜单会显示「系统代理模式 (已开启)」。
 
 ## ⚙️ 配置说明
 
-### 脚本内部变量
+### 代理端口与 API 地址
 
-如需自定义 API 地址、代理端口或内核文件名，可编辑脚本开头的配置区域：
+如需修改代理端口、API 端口或内核文件名，请直接编辑 `mihomo-manager.ahk`（然后重新编译），或确保 `mihomo.yaml` 配置与以下默认值一致：
 
-```powershell
-$ExeName    = "mihomo-windows-amd64.exe"   # 内核文件名
-$ConfigFile = "mihomo.yaml"                # 配置文件名
-$ApiHost    = "127.0.0.1"                  # API 监听地址
-$ApiPort    = 9090                         # API 端口
-$ProxyHost  = "127.0.0.1"                  # 代理监听地址
-$ProxyPort  = 7890                         # 代理端口
+```
+ExeName      := "mihomo-windows-amd64.exe"
+ConfigFile   := "mihomo.yaml"
+ApiHost      := "127.0.0.1"
+ApiPort      := "9090"
+ProxyHost    := "127.0.0.1"
+ProxyPort    := "7890"
 ```
 
-### Secret 密钥
+> 注意：编译好的 `.exe` 无法直接修改这些变量，如有自定义需求，请从源码编译。
 
-脚本会自动按以下优先级获取 API 访问密钥：
-1. **环境变量 `MIHOMO_SECRET`**（推荐）
-2. **配置文件 `mihomo.yaml` 中的 `secret` 字段**
-3. **默认值 `123456`**
+### API 密钥（Secret）
 
-若需查看当前使用的密钥来源，可设置环境变量 `MIHOMO_SECRET_DEBUG` 为 `1` (脱敏) 或 `full` (完整)：
-```powershell
-$env:MIHOMO_SECRET_DEBUG = "1"
-.\mihomo-manager.ps1 status
+工具会自动按以下顺序获取 API 访问密钥：
+1. 环境变量 `MIHOMO_SECRET`（推荐）
+2. 配置文件 `mihomo.yaml` 中的 `secret` 字段
+3. 默认值 `123456`
+
+确保 API 通信安全，请务必修改默认密钥。
+
+## 🔧 常见问题
+
+### 1. 双击 exe 后没有窗口，只在托盘出现图标
+这是正常行为，工具设计为静默后台运行，所有功能通过托盘右键菜单操作。
+
+### 2. 切换 TUN 模式失败，提示权限不足
+程序启动时会自动请求管理员权限，如果启动时取消了 UAC 弹窗，请重新运行程序并在提示时选择“是”。某些精简版系统可能禁用 UAC，可手动右键以管理员身份运行。
+
+### 3. 开机自启不生效
+检查 `shell:startup` 文件夹（运行窗口输入 `shell:startup`）中是否存在 `MihomoTray.lnk` 快捷方式，且指向的路径正确。杀软可能拦截创建，请放行或手动创建。
+
+### 4. 系统代理无法开启或关闭
+修改系统代理需要写入注册表 `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`，如被安全软件阻止，请将本工具加入白名单。
+
+### 5. 配置文件报错，或提示“验证失败”
+使用 **ℹ️ 验证配置** 查看具体错误。确保 `mihomo.yaml` 编码为 UTF-8，且所有节点、规则格式正确。也可以手动在命令行执行：
+```cmd
+mihomo-windows-amd64.exe -t -d . -f mihomo.yaml
 ```
 
 ## 📂 目录结构示例
 
 ```
-D:\Portable\mihomo\
-├── mihomo-manager.ps1      # 本脚本
-├── mihomo-windows-amd64.exe # Mihoomo 内核
-└── mihomo.yaml             # 内核配置文件
+D:\Tools\mihomo\
+├── MihomoTray.exe               # 本工具
+├── mihomo-windows-amd64.exe     # Mihomo 内核
+└── mihomo.yaml                  # 内核配置文件
 ```
-
-## 🔧 常见问题
-
-### 1. 脚本无法运行，提示“无法加载文件……未进行数字签名”
-
-**解决方法：**
-- 对脚本文件右键 → 属性 → 勾选“解除锁定” → 确定。
-- 或在 PowerShell 中执行 `Unblock-File -Path "路径\mihomo-manager.ps1"`。
-
-### 2. 停止 Mihomo 或操作需要管理员权限时提示权限不足
-
-脚本默认以普通用户权限运行。若需要管理员权限（例如停止以管理员启动的进程、使用 TUN 模式），请通过以下方式手动提权：
-- 在交互菜单中输入 `0`。
-- 或在命令行中执行 `.\mihomo-manager.ps1 elevate`。
-
-提权后会重新启动当前脚本并继承之前的操作参数。
-
-### 3. 系统代理无法开启/关闭
-
-系统代理通过修改注册表 `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings` 实现，需要当前用户具备注册表写入权限。若操作失败，请检查是否有安全软件拦截。
-
-### 4. 如何更换代理端口或 API 端口？
-
-修改脚本中对应的 `$ProxyPort` 和 `$ApiPort` 变量，并确保 `mihomo.yaml` 中的配置与之匹配。
 
 ## 📜 许可证
 
-本脚本基于原项目 [mihomo-manager.ps1](https://github.com/lvbibir/clash/blob/master/mihomo-manager.ps1) 修改而来，遵循原始项目的许可证（如有）。如无特别声明，可视为 MIT 许可。
+本工具源码基于 MIT 许可发布，详见仓库中的 LICENSE 文件（如有）。  
+内核 Mihomo 及其配置文件遵循其各自的开源协议。
 
 ## 🙏 致谢
 
-- 原作者：[clash](https://github.com/lvbibir)
-- 脚本中的延迟测试部分已移除，保留常用核心管理功能。
+- [Mihomo](https://github.com/MetaCubeX/mihomo) 核心项目
+- AutoHotkey 社区
+- 所有贡献者与使用者
+
+---
+
+> 编译版 `.exe` 由 `mihomo-manager.ahk` 使用 Ahk2Exe 生成，如需自行修改或编译，请下载仓库文件。
+```
+
+这样 README 就完全聚焦在你的 AHK 托盘工具上，没有一句多余内容。需要我再帮你调整措辞或补充截图占位符之类的细节吗？
