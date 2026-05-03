@@ -25,7 +25,7 @@
 - Windows 7 及以上（推荐 Windows 10/11）
 - 无需安装 AutoHotkey 或 PowerShell，直接运行 `.exe`
 - 需要将下列文件放在**同一目录**：
-  - `MihomoTray.exe`（本工具）
+  - `mihomo-manager.exe`（本工具）
   - `mihomo-windows-amd64.exe`（Mihomo 内核）
   - `mihomo.yaml`（Mihomo 配置文件）
 
@@ -33,9 +33,9 @@
 
 ### 从 Releases 获取
 
-1. 前往 [Releases](../../releases) 页面，下载最新版的 `MihomoTray.exe`。
-2. 将 `MihomoTray.exe` 放到已包含 `mihomo-windows-amd64.exe` 和 `mihomo.yaml` 的文件夹内。
-3. 双击运行 `MihomoTray.exe`，托盘区会出现一个网络图标 🌐。
+1. 前往 [Releases](../../releases) 页面，下载最新版的 `mihomo-manager.exe`。
+2. 将 `mihomo-manager.exe` 放到已包含 `mihomo-windows-amd64.exe` 和 `mihomo.yaml` 的文件夹内。
+3. 双击运行 `mihomo-manager.exe`，托盘区会出现一个网络图标 🌐。
 4. 右键托盘图标即可切换代理模式、重载配置等。
 5. （可选）在菜单中勾选「✅ 开机自启」，使工具随系统启动。
 
@@ -92,7 +92,7 @@ ProxyPort    := "7890"
 程序启动时会自动请求管理员权限，如果启动时取消了 UAC 弹窗，请重新运行程序并在提示时选择“是”。某些精简版系统可能禁用 UAC，可手动右键以管理员身份运行。
 
 ### 3. 开机自启不生效
-检查 `shell:startup` 文件夹（运行窗口输入 `shell:startup`）中是否存在 `MihomoTray.lnk` 快捷方式，且指向的路径正确。杀软可能拦截创建，请放行或手动创建。
+检查 `shell:startup` 文件夹（运行窗口输入 `shell:startup`）中是否存在 `mihomo-manager.lnk` 快捷方式，且指向的路径正确。杀软可能拦截创建，请放行或手动创建。
 
 ### 4. 系统代理无法开启或关闭
 修改系统代理需要写入注册表 `HKCU\Software\Microsoft\Windows\CurrentVersion\Internet Settings`，如被安全软件阻止，请将本工具加入白名单。
@@ -107,7 +107,7 @@ mihomo-windows-amd64.exe -t -d . -f mihomo.yaml
 
 ```
 D:\Tools\mihomo\
-├── MihomoTray.exe               # 本工具
+├── mihomo-managery.exe               # 本工具
 ├── mihomo-windows-amd64.exe     # Mihomo 内核
 └── mihomo.yaml                  # 内核配置文件
 ```
