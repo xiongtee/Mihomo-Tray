@@ -1,13 +1,13 @@
 ﻿<#
 .SYNOPSIS
-    Mihomo 裸核控制脚本 (支持交互菜单 + 命令行参数)
+    Mihomo 裸核控制脚本 (支持交互菜单 + 命令行参数，可手动提权)
 
 .DESCRIPTION
     用于管理 Mihomo 代理核心的 PowerShell 脚本，支持启动、停止、重启、状态查看、配置重载、
-    一键开关系统代理。
-    
+    一键开关系统代理，并提供手动提升至管理员权限的功能。
+
 .PARAMETER Action
-    要执行的操作: start, stop, restart, status, reload, proxy-on, proxy-off, admin-start, help
+    要执行的操作: start, stop, restart, status, reload, proxy-on, proxy-off, admin-start, elevate, help
     如果不提供参数，将进入交互菜单模式。
 
 .EXAMPLE
@@ -19,18 +19,16 @@
     一键开启系统代理（指向 Mihomo 代理端口）
 
 .EXAMPLE
+    .\mihomo-manager.ps1 elevate
+    将当前脚本提升为管理员权限并重新运行
+
+.EXAMPLE
     .\mihomo-manager.ps1 admin-start
-    以管理员权限启动 Mihomo
+    以管理员权限启动 Mihomo（仅进程，不提升脚本）
 
 .LINK
     https://github.com/xiongtee/mihomo-manager
 #>
-# 自动请求管理员权限
-if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-    Write-Host "正在请求管理员权限..." -ForegroundColor Cyan
-    Start-Process PowerShell -Verb RunAs -ArgumentList "-NoProfile -ExecutionPolicy Bypass -File `"$PSCommandPath`" $Args"
-    exit
-}
 
 param(
     [Parameter(Position = 0)]
@@ -42,7 +40,7 @@ param(
 $OutputEncoding = [System.Text.Encoding]::UTF8
 
 # 有效的操作列表
-$ValidActions = @("start", "stop", "restart", "status", "reload", "proxy-on", "proxy-off", "admin-start", "help", "")
+$ValidActions = @("start", "stop", "restart", "status", "reload", "proxy-on", "proxy-off", "admin-start", "elevate", "help", "")
 
 # ====================== 配置区域 ======================
 $CorePath   = if ($PSScriptRoot) { $PSScriptRoot } else { Split-Path -Parent $MyInvocation.MyCommand.Path }
@@ -203,15 +201,17 @@ Mihomo Manager - 使用说明
   restart      重启 Mihomo
   status       查看运行状态
   reload       重载配置文件
-  help         显示此帮助信息
   proxy-on     一键开启系统代理
   proxy-off    一键关闭系统代理
-  admin-start  以管理员权限启动 Mihomo
+  admin-start  以管理员权限启动 Mihomo (进程)
+  elevate      提升当前脚本为管理员权限
+  help         显示此帮助信息
 
 示例:
   .\mihomo-manager.ps1 start
   .\mihomo-manager.ps1 status
   .\mihomo-manager.ps1 proxy-on
+  .\mihomo-manager.ps1 elevate
   .\mihomo-manager.ps1 admin-start
 
 环境变量:
@@ -223,6 +223,21 @@ Mihomo Manager - 使用说明
 Secret 优先级: MIHOMO_SECRET > mihomo.yaml 的 secret > 默认值
 
 "@ -ForegroundColor Cyan
+}
+
+# ====================== 权限提升函数 ======================
+function Invoke-ElevateScript {
+    Write-Host "正在以管理员身份重新启动脚本..." -ForegroundColor Cyan
+    $argList = @(
+        "-NoProfile",
+        "-ExecutionPolicy", "Bypass",
+        "-File", "`"$PSCommandPath`""
+    )
+    if ($Action) {
+        $argList += $Action
+    }
+    Start-Process PowerShell -Verb RunAs -ArgumentList $argList
+    exit
 }
 
 # ====================== 核心操作函数 ======================
@@ -354,6 +369,7 @@ if ($Action) {
         "proxy-on"    { Enable-SystemProxy }
         "proxy-off"   { Disable-SystemProxy }
         "admin-start" { Start-Mihomo -RunAsAdmin }
+        "elevate"     { Invoke-ElevateScript }
         "help"        { Show-Help }
     }
 } else {
@@ -396,6 +412,7 @@ if ($Action) {
         Write-Host "  [7] 帮助信息"
         Write-Host "  [8] 切换系统代理"
         Write-Host "  [9] 管理员启动 Mihomo"
+        Write-Host "  [0] 获取管理员权限 (提升脚本)" -ForegroundColor DarkCyan
         Write-Host ""
         Write-Host "  [Q] 退出" -ForegroundColor Gray
         Write-Host ""
@@ -418,6 +435,10 @@ if ($Action) {
                 Read-Host "`n按回车键继续..."
             }
             "9" { Start-Mihomo -RunAsAdmin; Read-Host "`n按回车键继续..." }
+            "0" {
+                Invoke-ElevateScript
+                # 函数内部会退出，无需再暂停
+            }
             "Q" { Write-Host "再见！" -ForegroundColor Cyan; exit }
             default { Write-Host "无效选择，请重试" -ForegroundColor Yellow; Start-Sleep -Seconds 1 }
         }
