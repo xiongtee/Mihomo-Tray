@@ -367,10 +367,15 @@ IsAutoStartEnabled() => FileExist(StartupLnk)
 TrayMenu := A_TrayMenu
 TrayMenu.Delete
 
+; 📁 打开工作目录（位于最上方）
+TrayMenu.Add("📁 打开工作目录", (*) => Run(A_ScriptDir))
+
+; 动态菜单项
 Global SysProxyMenuName  := "√ 系统代理"
 Global TunMenuName       := "× TUN模式"
 Global AutoStartMenuName := "× 开机自启"
 
+TrayMenu.Add()
 TrayMenu.Add(SysProxyMenuName, (*) => ToggleSystemProxyMode())
 TrayMenu.Add(TunMenuName, (*) => ToggleTunMode())
 TrayMenu.Add()
@@ -404,11 +409,11 @@ UpdateMenuChecks() {
         AutoStartMenuName := autoNew
     }
 
-    Try TrayMenu.Default := SysProxyMenuName
+    ;Try TrayMenu.Default := SysProxyMenuName
 }
 
 TraySetIcon("shell32.dll", 14)
-A_IconTip := "Mihomo Manager"
+A_IconTip := "Mihomo Tray"
 
 _ShowTip("Mihomo 托盘管理器已启动", "右键托盘图标切换模式")
 
