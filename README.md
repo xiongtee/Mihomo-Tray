@@ -1,4 +1,4 @@
-# Mihomo Tray（原 Mihomo Manager）
+# Mihomo Tray
 
 一个轻量级的 Windows 系统托盘工具，用于一键管理 [Mihomo](https://github.com/MetaCubeX/mihomo) 代理内核的**系统代理**和 **TUN 模式**，同时提供配置重载、验证、开机自启、快速打开工作目录等常用功能。
 
