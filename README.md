@@ -1,15 +1,15 @@
 # Mihomo Tray
 
-一个轻量级的 Windows 系统托盘工具，用于一键管理 [Mihomo](https://github.com/MetaCubeX/mihomo) 代理内核的**系统代理**和 **TUN 模式**，同时提供配置重载、验证、快速打开工作目录等常用功能。
+一个轻量级的 Windows 系统托盘工具，用于一键管理 [Mihomo](https://github.com/MetaCubeX/mihomo) 代理内核的**系统代理**和 **TUN 模式**，同时提供配置重载、验证、打开目录等常用功能。
 
 使用 AutoHotkey v2 编写，可编译为独立 `.exe`，无需安装任何依赖。
 
-## ✨ 功能特性
+## 功能
 
 - 🌐 **模式一键切换**  
   - **系统代理**：启动内核并设置 Windows 系统代理（`127.0.0.1:7890`）  
   - **TUN 模式**：以管理员权限启动内核，不修改系统代理
-- 📁 **打开工作目录**  
+- 📁 **打开目录**  
   在托盘菜单最上方一键打开 Mihomo 所在文件夹，方便手动编辑 `mihomo.yaml` 或查看日志
 - 🔄 **配置重载**  
   调用 Mihomo API 热重载配置文件，无需重启内核
@@ -20,7 +20,7 @@
 - 💬 **气泡提示反馈**  
   所有操作结果均通过系统托盘气泡显示，不干扰当前工作
 
-## 📋 系统要求
+## 系统要求
 
 - Windows 7 及以上（推荐 Windows 10/11）
 - 无需安装 AutoHotkey 或额外运行时，直接运行 `.exe`
@@ -29,7 +29,7 @@
   - `mihomo-windows-amd64.exe`（Mihomo 内核）
   - `mihomo.yaml`（Mihomo 配置文件）
 
-## ⚡ 快速开始
+## 快速开始
 
 ### 从 Releases 获取
 
@@ -41,7 +41,7 @@
 > 💡 首次运行时，Windows 或杀毒软件可能弹出安全警告，点击“更多信息”→“仍要运行”即可。这是因为编译后的 `.exe` 未购买代码签名证书，并非恶意软件。  
 > 本工具完全开源，源码见 [Mihomo Tray.ahk](./Mihomo%20Tray.ahk)，可自行审查或使用 [AutoHotkey v2](https://www.autohotkey.com/) 重新编译。
 
-## 🕹️ 托盘菜单说明
+## 托盘菜单说明
 
 右键系统托盘图标，弹出菜单：
 
@@ -56,7 +56,7 @@
 
 > 所有带开关状态的菜单项使用 **`开`** 和 **`关`** 前缀，操作后即时刷新，无需重新打开菜单。
 
-## ⚙️ 配置说明
+## 配置说明
 
 ### 代理端口与 API 地址
 
@@ -82,12 +82,12 @@ ProxyPort    := "7890"
 
 确保 API 通信安全，请务必修改默认密钥。
 
-## 🛠️ 自行编译
+## 自行编译
 
 如果你想从源码自行编译为 `.exe`，请使用 **AutoHotkey v2** 和 **Ahk2Exe.exe**，并在“Base File”下拉菜单中选择 **`U64 AutoHotkey64.exe`**（适用于 64 位 Windows）。  
 这将生成无需安装 AHK 的独立可执行文件，文件结构与 Release 中提供的完全一致。
 
-## 🔧 常见问题
+## 常见问题
 
 ### 1. 双击 exe 后没有窗口，只在托盘出现图标
 这是正常行为，工具设计为静默后台运行，所有功能通过托盘右键菜单操作。
@@ -104,7 +104,7 @@ ProxyPort    := "7890"
 mihomo-windows-amd64.exe -t -d . -f mihomo.yaml
 ```
 
-## 📂 目录结构示例
+## 目录结构示例
 
 ```
 D:\Tools\mihomo\
@@ -113,12 +113,12 @@ D:\Tools\mihomo\
 └── mihomo.yaml                    # 内核配置文件
 ```
 
-## 📜 许可证
+## 许可证
 
 本工具源码基于 MIT 许可发布，详见仓库中的 LICENSE 文件（如有）。  
 内核 Mihomo 及其配置文件遵循其各自的开源协议。
 
-## 🙏 致谢
+## 致谢
 
 - [Mihomo](https://github.com/MetaCubeX/mihomo) 核心项目
 - AutoHotkey 社区
