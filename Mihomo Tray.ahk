@@ -1,6 +1,6 @@
-﻿; ============================================================
+; ============================================================
 ; Mihomo Tray Manager - AutoHotkey v2（托盘版·自动管理员）
-; 功能：一键切换系统代理 / TUN 模式，验证/重载配置，开机自启
+; 功能：一键切换系统代理 / TUN 模式，验证/重载配置
 ;       所有反馈均通过托盘气泡提示，关键错误保留弹窗
 ;       脚本默认以管理员身份启动，确保 TUN 模式关闭稳定可靠
 ; 编译：使用 Ahk2Exe.exe 将本脚本编译为 .exe 即可。
@@ -319,20 +319,6 @@ ToggleTunMode() {
     UpdateMenuChecks()
 }
 
-ToggleAutoStart() {
-    Global ScriptDir
-    if IsAutoStartEnabled() {
-        FileDelete(StartupLnk)
-        UpdateMenuChecks()                  ; ← 先更新
-        _ShowTip("开机自启", "已关闭")
-    } else {
-        FileCreateShortcut(A_ScriptFullPath, StartupLnk, ScriptDir, "", "Mihomo 托盘管理")
-        UpdateMenuChecks()                  ; ← 先更新
-        _ShowTip("开机自启", "已开启")
-    }
-    UpdateMenuChecks()
-}
-
 ; ====================== 重载配置 ======================
 ReloadConfig() {
     Global Secret, ApiUrl
@@ -358,22 +344,16 @@ ReloadConfig() {
     }
 }
 
-; ====================== 开机自启 ======================
-StartupLnk := A_Startup "\MihomoTray.lnk"
-
-IsAutoStartEnabled() => FileExist(StartupLnk)
-
 ; ====================== 托盘菜单 ======================
 TrayMenu := A_TrayMenu
 TrayMenu.Delete
 
-; 📁 打开工作目录（位于最上方）
-TrayMenu.Add("📁 打开工作目录", (*) => Run(A_ScriptDir))
+; 📁 打开目录（位于最上方）
+TrayMenu.Add("📁 打开目录", (*) => Run(A_ScriptDir))
 
 ; 动态菜单项
-Global SysProxyMenuName  := "√ 系统代理"
-Global TunMenuName       := "× TUN模式"
-Global AutoStartMenuName := "× 开机自启"
+Global SysProxyMenuName  := "开 系统代理"
+Global TunMenuName       := "关 TUN模式"
 
 TrayMenu.Add()
 TrayMenu.Add(SysProxyMenuName, (*) => ToggleSystemProxyMode())
@@ -382,31 +362,23 @@ TrayMenu.Add()
 TrayMenu.Add("🔁 重载配置", (*) => ReloadConfig())
 TrayMenu.Add("ℹ️ 验证配置", (*) => (TestConfig() ? _ShowTip("验证通过", "配置文件正确") : ""))
 TrayMenu.Add()
-TrayMenu.Add(AutoStartMenuName, (*) => ToggleAutoStart())
-TrayMenu.Add()
-TrayMenu.Add("❌ 退出", (*) => ExitApp())
+TrayMenu.Add("退出", (*) => ExitApp())
 
 SetTimer(UpdateMenuChecks, 200)
 
 UpdateMenuChecks() {
-    Global SysProxyMenuName, TunMenuName, AutoStartMenuName
+    Global SysProxyMenuName, TunMenuName
 
-    sysNew := (IsSystemProxyMode() ? "√ " : "× ") "系统代理"
+    sysNew := (IsSystemProxyMode() ? "开 " : "关 ") "系统代理"
     if (SysProxyMenuName != sysNew) {
         Try TrayMenu.Rename(SysProxyMenuName, sysNew)
         SysProxyMenuName := sysNew
     }
 
-    tunNew := (IsTunMode() ? "√ " : "× ") "TUN模式"
+    tunNew := (IsTunMode() ? "开 " : "关 ") "TUN模式"
     if (TunMenuName != tunNew) {
         Try TrayMenu.Rename(TunMenuName, tunNew)
         TunMenuName := tunNew
-    }
-
-    autoNew := (IsAutoStartEnabled() ? "√ " : "× ") "开机自启"
-    if (AutoStartMenuName != autoNew) {
-        Try TrayMenu.Rename(AutoStartMenuName, autoNew)
-        AutoStartMenuName := autoNew
     }
 
     ;Try TrayMenu.Default := SysProxyMenuName
