@@ -4,7 +4,7 @@
 
 基于 AutoHotkey v2 实现，可编译为独立可执行文件运行，无需额外运行时环境。
 
-需要 'mihomo.yaml'为：
+需要 `mihomo.yaml`为：
 ```
 tun:
   enable: false
