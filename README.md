@@ -8,7 +8,6 @@
 ```
 tun:
   enable: false
-
 ```
 
 ---
